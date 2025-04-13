@@ -1,5 +1,5 @@
+import os
 import io
-from io import BytesIO
 import tempfile
 import os
 import json
@@ -72,7 +72,11 @@ def convert_kind_type_from_path(file_path: str):
     """
     This function will receive a file path, read the file and process it.
     """
+    # Get the input file directory from environment variable
+    input_audio_path = os.getenv("INPUT_AUDIO_PATH", "/app/input_audio")
+
     # Open the file from the provided path and read it as binary
+    file_path = os.path.join(input_audio_path, file_path)
     with open(file_path, "rb") as f:
         file_content = f.read()
     
@@ -94,14 +98,18 @@ def convert_kind_type_from_path(file_path: str):
 import asyncio
 
 async def main():
+    # Get the output path from environment variable
+    output_text_path = os.getenv("OUTPUT_TEXT_PATH", "/app/output_text")
+
     file_path = "sample.wav"  
     result = await prepare_text_from_path(file_path, lang="fa-IR")
     
     transcript = result.get("transcript", "")
-    with open("output.txt", "w", encoding="utf-8") as file:
+    output_file = os.path.join(output_text_path, "output.txt")
+    with open(output_file, "w", encoding="utf-8") as file:
         file.write(transcript)
     
-    print("output saved.")
+    print(f"output saved at {output_file}")
 
 if __name__ == "__main__":
     asyncio.run(main())
